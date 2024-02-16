@@ -1,0 +1,41 @@
+{
+  "name": "aso_server",
+  "version": "1.0.0",
+  "description": "This is the Backend for the project ASO PILIOT. <!-- requires oython 3.10.12 --> <!-- pip install -r requirements.txt -- run this command to intsall all the dependencies required to run this project -->",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/varaprasadbhukya/aso_server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/varaprasadbhukya/aso_server/issues"
+  },
+  "homepage": "https://github.com/varaprasadbhukya/aso_server#readme",
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "google-play-scraper": "^10.0.0",
+    "http-status": "^1.7.3",
+    "jsonwebtoken": "^9.0.2",
+    "method-override": "^3.0.0",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.9.9",
+    "nodemon": "^3.0.3",
+    "pg": "^8.11.3",
+    "winston": "^3.11.0"
+  }
+}
