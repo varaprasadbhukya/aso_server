@@ -1,5 +1,5 @@
 import config from "../config/config.js";
 const tables = {
-    registrations: `${config.psql_schema}.registrations`,
-}
+  registrations: `public.registrations`,
+};
 export default tables;
