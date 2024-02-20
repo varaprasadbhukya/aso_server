@@ -55,6 +55,32 @@ class authController {
         }
 
     })
+
+    googleLoginController = catchAsync(async (req, res) => {
+        const Response = new response(res)
+        try {
+            const result = await authService.googleLoginService(req.body, req.user);
+            return Response.success('Login Successfully', 'SUCCESS', 200, { data: result })
+
+        } catch (error) {
+            console.error('error @ googleLogin Controller', error)
+            return Response.error(error.message, 'ERROR', error.statusCode)
+        }
+
+    })
+
+    resendMailController = catchAsync(async (req, res) => {
+        const Response = new response(res)
+        try {
+            const result = await authService.resendMailService(req.body, req.user);
+            return Response.success('Mail sent Successfully', 'SUCCESS', 200, { data: result })
+
+        } catch (error) {
+            console.error('error @ resendmail Controller', error)
+            return Response.error(error.message, 'ERROR', error.statusCode)
+        }
+
+    })
 }
 
 export default new authController()

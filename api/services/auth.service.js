@@ -40,7 +40,7 @@ class authService {
             // }
             // else {
             const key = crypto.randomBytes(16).toString("hex") // Generating random token
-            const token = jwt.sign({ email: body.email, token: key }, `${config.jwtSecret}`, { expiresIn: '1h' });
+            const token = jwt.sign({ email: body.email, token: key }, `${config.jwtSecret}`, { expiresIn: '2h' });
 
             console.log(key, "---------------->Token")
 
@@ -54,6 +54,7 @@ class authService {
             }
             const expiry = Math.floor(Date.now() / 1000) + 3600;
             await pool.query(registration.signup, [body.email, body.password, key, expiry])
+            return "Mail Sent"
             // }
         } catch (error) {
             console.error('error @ signup Service', error)
@@ -68,16 +69,17 @@ class authService {
             if (checkmail?.rows?.length) {
                 const res = await pool.query(registration.signin, [body.email, body.password])
                 if (res?.rows?.length) {
-                    // console.log(res?.rows[0]?.mail_confirmation, res?.rows[0]?.mail_confirmation === 1, "---------------------->response")
+                    console.log(res?.rows[0]?.mail_confirmation, res?.rows[0]?.mail_confirmation === 1, "---------------------->response")
                     if (res?.rows[0]?.mail_confirmation === 1) {
+
                         const payload = { mail_id: body.mail_id }
                         const accesstoken = jwt.sign(payload, config.jwtSecret, {
                             expiresIn: '720h',
                         });
-                        return { authorization: accesstoken }
+                        return { authorization: accesstoken, reg_done: `${res?.rows[0]?.registration_done}` }
                     }
                     else {
-                        throw new ApiError(400, 'Mail Not Verified')
+                        throw new ApiError(400, 'Mail Not Verified Please Verify the mail')
                     }
                 }
                 else {
@@ -96,7 +98,6 @@ class authService {
     }
 
     verifyService = async (body) => {
-        console.log(body, "------------------->Inside Signin")
         const token = body.param.token
         console.log(body.param.token, "---------------------->ParamToken")
         try {
@@ -109,16 +110,19 @@ class authService {
             if (resp?.rows?.length) {
 
                 const confirmation = await pool.query(registration.checkconfirmation, [extractedEmail])
-                if ((confirmation?.rows[0]?.mail_conformation !== 1) && (current_time < confirmation?.rows[0]?.expiry)) {
+                console.log(confirmation.rows[0], "-----------------_>confirm")
+                console.log((confirmation?.rows[0]?.mail_confirmation !== 1), (current_time < confirmation?.rows[0]?.expiry), (confirmation?.rows[0]?.mail_confirmation !== 1) && (current_time < confirmation?.rows[0]?.expiry), "--------------->")
+                if ((confirmation?.rows[0]?.mail_confirmation !== 1) && (current_time < confirmation?.rows[0]?.expiry)) {
                     await pool.query(registration.upd_mail_conformation, [1, extractedEmail])
-                    const payload = { mail_id: extractedEmail }
-                    const accesstoken = jwt.sign(payload, config.jwtSecret, {
-                        expiresIn: '720h',
-                    });
-                    return { authorization: accesstoken }
+                    // const payload = { mail_id: extractedEmail }
+                    // const accesstoken = jwt.sign(payload, config.jwtSecret, {
+                    //     expiresIn: '720h',
+                    // });
+                    // return { authorization: accesstoken }
+                    return "Mail Verified"
                 }
-                else if ((confirmation?.rows[0]?.mail_conformation !== 1) && (current_time > confirmation?.rows[0]?.expiry)) {
-                    throw new ApiError(400, 'Verification Link Expired')
+                else if ((confirmation?.rows[0]?.mail_confirmation !== 1) && (current_time > confirmation?.rows[0]?.expiry)) {
+                    throw new ApiError(400, 'Link Expired')
                 }
                 else {
                     throw new ApiError(400, 'Mail Already Verified')
@@ -146,6 +150,60 @@ class authService {
             return "Registered Successfully"
         } catch (error) {
             console.error('error @ verify Service', error)
+            throw new ApiError(error.statusCode || 500, error)
+        }
+    }
+
+    googleLoginService = async (body) => {
+        console.log(body, "------------>body")
+        try {
+            const checkmail = await pool.query(registration.signupcheck, [body.mail])
+            if (checkmail?.rows[0]?.mail_id !== "NULL") {
+                const res = await pool.query(registration.checkreg, [body.mail])
+                if (res?.rows[0]?.registration_done) {
+                    return "reg_done"
+                }
+                else {
+                    return "reg_not_done"
+                }
+            }
+            else {
+                const resp = await pool.query(registration.insertmail, [body.mail])
+                return "mail_registered"
+            }
+
+        } catch (error) {
+            console.error('error @ Login Service', error)
+            throw new ApiError(error.statusCode || 500, error)
+        }
+    }
+
+    resendMailService = async (body) => {
+        console.log(body, "------------------_>body")
+        try {
+
+            const token_url = body.param.token
+            const decoded = jwt.verify(token_url, config.jwtSecret);
+            const extractedEmail = decoded.email;
+
+
+            const key = crypto.randomBytes(16).toString("hex") // Generating random token
+            const token = jwt.sign({ email: body.email, token: key }, `${config.jwtSecret}`, { expiresIn: '2h' });
+
+            let subjectLine = `ASOPilot Activation Link`
+            let content = `Dear <br> This is Activation Mail <br>
+                Press the below link to confirm your email
+                <a href="http://localhost:3000/verify/${token}">CONFIRM<a>`
+
+            const expiry = Math.floor(Date.now() / 1000) + 3600;
+            const resp = await pool.query(registration.resendmail, [token, expiry, extractedEmail])
+
+            if (body.email) {
+                sendEmail(body.email, subjectLine, content)
+            }
+
+        } catch (error) {
+            console.error('error @ resendMail Service', error)
             throw new ApiError(error.statusCode || 500, error)
         }
     }
