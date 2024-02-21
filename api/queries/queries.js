@@ -11,3 +11,7 @@ export const registration = {
     resendmail: `UPDATE ${tables.registrations} set token=$1,expiry=$2 where mail_id=$3`,
     insertmail: `INSERT INTO ${tables.registrations} (mail_id) VALUES ($1)`
 };
+
+export const appData = {
+    getapp_id: `SELECT app_id from ${tables.registrations} where mail_id = $1`
+}

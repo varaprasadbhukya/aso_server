@@ -6,7 +6,7 @@ class appdataController {
     appdatacontroller = catchAsync(async (req, res) => {
         const Response = new response(res)
         try {
-            const result = await appdataService.appdataservice(req.body);
+            const result = await appdataService.appdataservice(req.body, req.user);
             return Response.success('fetched Successfully', 'SUCCESS', 200, { data: result })
 
         } catch (error) {
