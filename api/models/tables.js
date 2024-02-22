@@ -18,7 +18,8 @@ const models = async () => {
       mail_confirmation INT default 0,
       registration_done BOOLEAN,
       token VARCHAR(60),
-      expiry INT
+      expiry INT,
+      prompt text
       )` );
 
   } catch (error) {

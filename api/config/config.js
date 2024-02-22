@@ -31,6 +31,7 @@ const config = {
 
   email: envVars.EMAIL,
   password: envVars.PASSWORD,
+  open_ai_key: envVars.OPENAI_KEY
   // redis: {
   //     url: envVars.RedisUrl,
   // },

@@ -13,5 +13,8 @@ export const registration = {
 };
 
 export const appData = {
-    getapp_id: `SELECT app_id from ${tables.registrations} where mail_id = $1`
+    getapp_id: `SELECT app_id from ${tables.registrations} where mail_id = $1`,
+    checkprompt: `SELECT prompt from ${tables.registrations} where mail_id = $1 `,
+    insert_prompt: `update ${tables.registrations} set prompt = $1 where mail_id = $2`,
+    getPrompt: `SELECT prompt from ${tables.registrations} where mail_id=$1`
 }
