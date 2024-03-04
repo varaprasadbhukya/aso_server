@@ -11,11 +11,14 @@ import gplay from "google-play-scraper";
 
 class searchService {
   searchservice = async (body) => {
+    console.log(body, "----------------------------->body")
     try {
       const res = await gplay.search({
-        term: body.appname,
+        term: body?.appname,
         num: 3,
+        country: body?.country
       });
+
       return res;
     } catch (error) {
       console.error("error @ search service", error);

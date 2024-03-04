@@ -35,7 +35,7 @@ class appdataService {
 
                 const result1 = await gplay.reviews({
                     appId: resp?.rows[0]?.app_id,
-                    sort: gplay.sort.NEWEST,
+                    sort: gplay.sort.HELPFULNESS,
                     lang: "en",
                     country: "us",
                     paginate: true,

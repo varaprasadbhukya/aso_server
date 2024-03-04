@@ -1,6 +1,6 @@
 import tables from "../db/pg_tables.js";
 export const registration = {
-    signupcheck: `SELECT mail_id,registration_done from ${tables.registrations} where mail_id = $1`,
+    signupcheck: `SELECT mail_id,password,registration_done from ${tables.registrations} where mail_id = $1`,
     signup: `INSERT INTO ${tables.registrations} (mail_id,password) VALUES ($1,$2)`,
     checkconfirmation: `SELECT mail_confirmation,expiry from ${tables.registrations} where mail_id = $1`,
     upd_mail_conformation: `update ${tables.registrations} set mail_confirmation=$1 where mail_id=$2`,

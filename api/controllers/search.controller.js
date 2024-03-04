@@ -5,15 +5,15 @@ class searchController {
 
     searchcontroller = catchAsync(async (req, res) => {
         const Response = new response(res)
-        try {
-            const result = await searchService.searchservice(req.body);
-            return Response.success('fetched Successfully', 'SUCCESS', 200, { data: result })
+        // try {
+        const result = await searchService.searchservice(req.body);
+        return Response.success('fetched Successfully', 'SUCCESS', 200, result)
 
-        } catch (error) {
-            console.error('error @ createAccount Controller', error)
-            throw new ApiError(500, error)
+        // } catch (error) {
+        //     console.error('error @ createAccount Controller', error)
+        //     throw new ApiError(500, error)
 
-        }
+        // }
 
     })
 }

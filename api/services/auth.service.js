@@ -43,9 +43,15 @@ class authService {
             if (resp?.rows?.length) {
                 throw new ApiError(400, "Email Exist");
             } else {
+                const saltRounds = 10; // Recommended number of rounds
+                const salt = await bcrypt.genSalt(saltRounds);
+
+                // Hash the password with salt and multiple iterations
+                const hashedPassword = await bcrypt.hash(body.password, salt);
+
                 await pool.query(registration.signup, [
                     body.email,
-                    body.password,
+                    hashedPassword
                     // key,
                     // expiry,
                 ]);
@@ -92,18 +98,19 @@ class authService {
                 body.email,
             ]);
             if (checkmail?.rows?.length) {
-                const res = await pool.query(registration.signin, [
-                    body.email,
-                    body.password,
-                ]);
-                if (res?.rows?.length) {
+                const user = checkmail.rows[0];
+                console.log(user, "----------------------->User")
+                // Compare the provided password with the hashed password stored in the database
+                const passwordMatch = await bcrypt.compare(body.password, user.password);
+                console.log(passwordMatch, "--------------------->passwordmatch")
+                if (passwordMatch) {
                     const payload = { mail_id: body.email };
                     const accesstoken = jwt.sign(payload, config.jwtSecret, {
                         expiresIn: "720h",
                     });
                     return {
                         authorization: accesstoken,
-                        registered: res.rows[0].registration_done,
+                        registered: user.registration_done,
                     };
                 } else {
                     throw new ApiError(400, "Wrong credentials");
